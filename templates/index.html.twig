@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>JobBoard</title>
+</head>
+<body>
+{% block content %}
+    <div>
+        <form method="get">
+            <label for="jobType">Métier</label>
+            <select name="jobType" id="jobType">
+                <option value="">All</option>
+                {% for jobType in jobTypes %}
+                    <option value="{{ jobType['id'] }}" {% if app.request.query.get('jobType') == jobType['id'] %}selected{% endif %}>{{ jobType['jobType'] }}</option>
+                {% endfor %}
+            </select>
+
+            <label for="contract">Contrat</label>
+            <select name="contractType" id="contract">
+                <option value="">All</option>
+                {% for contract in contracts %}
+                    <option value="{{ contract['id'] }}" {% if app.request.query.get('contractType') == contract['id'] %}selected{% endif %}>{{ contract['contractType'] }}</option>
+                {% endfor %}
+            </select>
+            
+            <label for="city">Ville</label>
+            <select name="city" id="city">
+                <option value="">All</option>
+                {% for city in cities %}
+                    <option value="{{ city['id'] }}" {% if app.request.query.get('city') == city['id'] %}selected{% endif %}>{{ city['cityName'] }}</option>
+                {% endfor %}
+            </select>
+
+            <label>Date:</label>
+            <select name="dateFilter">
+                <option value="">Indefini</option>
+                <option value="new" {% if app.request.query.get('dateFilter') == 'new' %}selected{% endif %}>Recent</option>
+                <option value="old" {% if app.request.query.get('dateFilter') == 'old' %}selected{% endif %}>Ancient</option>
+            </select>
+
+            <button type="submit">Recherche</button>
+        </form>
+        <a href="{{ path('app_index') }}">Reset</a>
+
+    
+        <div>
+            {% for job in data %}
+                <table style="border-collapse: collapse; height: 200px;" border="1">
+                    <tbody>
+                        <tr style="height: 189px;">
+                            <td style="width: 200px; height: 200;">
+                                <img src={{job.image}} alt="" width="200" height="200" />
+                            </td>
+                            <td style="width: 327px; height: 200px;">
+                                <p>{{ job.uploadDate }}</p>
+                                <p>{{ job.company }} / {{ job.jobAdName }}</p>
+                                <p>{{ job.id }}</p>
+                                <p>{{ job.jobType }} / {{ job.contractType }} / {{ job.city }}</p>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            {% endfor %}
+            
+        </div>
+    </div>
+{% endblock %}
+<div class="pagination">
+    <ul>
+        {% if totalResults != 0 %}
+            {% set totalPages = (totalResults / perPage) | round(0, 'ceil') %}
+            {% for page in 1..totalPages %}
+                <a href="{{ path('app_index', {'page': page, 'city': app.request.query.get('city'), 'contractType': app.request.query.get('contractType'), 'jobType': app.request.query.get('jobType'), 'dateFilter': app.request.query.get('dateFilter')  }) }}">{{ page }}</a>
+            {% endfor %}
+        {% endif %}
+    </ul>
+</div>
+
+</body>
+</html>
